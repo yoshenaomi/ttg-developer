@@ -1,6 +1,7 @@
-document.getElementById('registrationForm').addEventListener('submit', function(event) {
+document.getElementById('registrationForm').addEventListener('submit', async function(event) {
     event.preventDefault(); 
 
+    const fullName = document.getElementById('fullName').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
@@ -28,7 +29,29 @@ document.getElementById('registrationForm').addEventListener('submit', function(
         return;
     }
 
-    // Jika semua validasi berhasil
-    messageDiv.textContent = 'Pendaftaran Berhasil';
-    messageDiv.style.color = 'green';
+    // Jika semua validasi berhasil, kirim data ke API
+    try {
+        const response = await fetch('http://localhost:3000/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                fullName: fullName,
+                email: email,
+                password: password
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Gagal mendaftar, silakan coba lagi.');
+        }
+
+        const result = await response.json();
+        messageDiv.textContent = 'Pendaftaran Berhasil';
+        messageDiv.style.color = 'green';
+    } catch (error) {
+        messageDiv.textContent = error.message;
+        messageDiv.style.color = 'red';
+    }
 });
